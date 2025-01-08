@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        
+       
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgb(232, 114, 112) 0%, rgba(224, 114, 112, 0.75) 38.6%, rgba(231, 85, 158, 0.52) 72.1%, rgba(235, 104, 202, 0.24) 94.7% );
+            color: #fff;
+        }
+
+        .container {
+            text-align: center;
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
+
+        h1 {
+            margin: 0 0 20px;
+            font-size: 2.5rem;
+            color: #c955c3;
+            text-transform: uppercase;
+            font-family:cursive;
+            font-style:oblique;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 110px);
+            grid-gap: 15px;
+            margin: 20px auto;
+        }
+
+        .cell {
+            width: 110px;
+            height: 110px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            cursor: pointer;
+            box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .cell:hover {
+            background-color: #bdc3c7;
+            transform: scale(1.1);
+        }
+
+        .cell.taken {
+            cursor: not-allowed;
+        }
+
+        .message {
+            font-size: 1.3rem;
+            margin-top: 10px;
+            color: #34495e;
+        }
+
+        .reset {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            color: #fff;
+            background-color: #e360aa;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .reset:hover {
+            background-color: #ea8dbb;
+        }
+    </style>
+    
+   
+</head>
+<body>
+    <div class="container">
+        <h1>Tic Tac Toe</h1>
+        <div class="board" id="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+        <div class="message" id="message">Player X's turn</div>
+        <button class="reset" id="reset">Reset Game</button>
+    </div>
+
+
+    <script>
+    const board = document.getElementById('board');
+    const message = document.getElementById('message');
+    const resetButton = document.getElementById('reset');
+
+    let currentPlayer = 'X';
+    let gameActive = true;
+    const boardState = Array(9).fill(null);
+
+    const winningCombinations = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
+    ];
+
+    function createBoard() {
+        board.innerHTML = '';
+        boardState.forEach((_, index) => {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.dataset.index = index;
+            cell.addEventListener('click', handleCellClick);
+            board.appendChild(cell);
+        });
+    }
+
+    function handleCellClick(event) {
+        const cell = event.target;
+        const index = cell.dataset.index;
+
+        if (boardState[index] || !gameActive) return;
+
+        boardState[index] = currentPlayer;
+        cell.textContent = currentPlayer;
+        cell.classList.add('taken');
+
+        if (checkWin()) {
+            message.textContent = `🎉 Player ${currentPlayer} wins!`;
+            gameActive = false;
+        } else if (boardState.every(cell => cell)) {
+            message.textContent = '🤝 Its a draw!';
+            gameActive = false;
+        } else {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            message.textContent = `Player ${currentPlayer}'s turn`;
+        }
+    }
+
+    function checkWin() {
+        return winningCombinations.some(combination => {
+            return combination.every(index => boardState[index] === currentPlayer);
+        });
+    }
+
+    function resetGame() {
+        currentPlayer = 'X';
+        gameActive = true;
+        boardState.fill(null);
+        message.textContent = `Player ${currentPlayer}'s turn`;
+        createBoard();
+    }
+
+    resetButton.addEventListener('click', resetGame);
+
+    createBoard();
+    message.textContent = `Player ${currentPlayer}'s turn`;
+
+</script>
+</body>
+</html>
